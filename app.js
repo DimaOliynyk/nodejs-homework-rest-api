@@ -1,8 +1,16 @@
 const express = require('express')
 const logger = require('morgan')
 const cors = require('cors')
-
 const contactsRouter = require('./routes/api/contacts')
+const mongoose = require('mongoose');
+
+mongoose.connect('mongodb+srv://new-user_1:DimaOliynyk2007@cluster0.ns0y4.mongodb.net/db-contacts?retryWrites=true&w=majority', {useNewUrlParser: true});
+
+const db = mongoose.connection;
+db.on("error", console.error.bind(console, "connection error: "));
+db.once("open", function () {
+  console.log("Connected successfully");
+});
 
 const app = express()
 
