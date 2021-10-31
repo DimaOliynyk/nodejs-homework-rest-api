@@ -6,41 +6,118 @@ router.get('/', async (req, res, next) => {
 
   try{
     const contacts = await contactsModel.find();
+
+    return res.json({
+      status: 'success',
+      code: 200,
+      data: {
+        contacts,
+      }
+    })
+  } catch(error){
+    next(error)
+
+  }
+
+});
+
+router.get('/:contactId', async (req, res, next) => {
+  const { contactId } = req.params;
+  try{
+    const contacts = await contactsModel.findById(contactId);
+
+    console.log(contacts)
     res.json({ message: contacts })
   } catch(error){
     res.status(500).send({message: 'error'})
     console.log(error)
   }
 
-});
+})
 
-router.get('/:contactId', async (req, res, next) => {
+router.post('/', async (req, res, next) => {
+
+    try {
+      const new_contact = await contactsModel.create(req.body);
+
+      return res.json({
+        status: 'success',
+        code: 200,
+        data: {
+          new_contact,
+        }
+      })
+    } catch (error) {
+      console.log(error)
+      res.status(500).json(error);
+    }
+
+})
+
+router.delete('/:contactId', async (req, res, next) => {
+  const { contactId } = req.params;
   try{
-    const contacts = await contactsModel.findById(contactId);
-    res.json({ message: contacts })
+    const contact = await contactsModel.findByIdAndDelete(contactId)
+    return res.json({
+      status: 'contact deleted',
+      code: 200,
+      data: {
+        contact,
+      }
+    })
   } catch(error){
     res.status(500).send({message: 'error'})
     console.log(error)
   }
 })
 
-// router.post('/', async (req, res, next) => {
-//   const contact = new contactsModel(req.body);
+router.put('/:contactId', async (req, res, next) => {
+  const { contactId } = req.params;
+  try{
+    const updated_contact = await contactsModel.findByIdAndUpdate(contactId, req.body, {
+      new: true
+    })
+
+    console.log(updated_contact)
+    return res.json({
+      status: 'success',
+      code: 200,
+      data: {
+        updated_contact,
+      }
+    })
+  } catch(error){
+    res.status(500).send({message: 'error'})
+    console.log(error)
+  }
+})
+
+router.patch('/:contactId/favorite', async (req, res, next) => {
+  const { contactId } = req.params;
+  try{
+    const contact = await contactsModel.findByIdAndUpdate(contactId);
+
+    console.log(contact)
+    if(contact.favorite === false){
+      contact.favorite = true
+    } else {
+      contact.favorite = false
+    }
+
   
-//     try {
-//       await contact.save();
-//       res.json(user);
-//     } catch (error) {
-//       res.status(500).json(error);
-//     }
-// })
+    return res.json({
+      status: 'success',
+      code: 200,
+      data: {
+        contact,
+      }
+    })
 
-// router.delete('/:contactId', async (req, res, next) => {
-//   res.json({ message: 'template message' })
-// })
+  
+  } catch(error){
+    res.status(500).send({message: 'error'})
+    console.log(error)
+  }
 
-// router.patch('/:contactId', async (req, res, next) => {
-//   res.json({ message: 'template message' })
-// })
-
+} )
 module.exports = router
