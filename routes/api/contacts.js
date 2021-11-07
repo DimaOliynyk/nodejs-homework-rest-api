@@ -95,8 +95,15 @@ router.put('/:contactId', async (req, res, next) => {
 router.patch('/:contactId/favorite', async (req, res, next) => {
   const { contactId } = req.params;
   try{
-    const contact = await contactsModel.findByIdAndUpdate(contactId);
+    const contact = await contactsModel.findById(contactId);
 
+    if(
+      req.body.favorite === undefined ||
+      typeof req.body.favourite !== 'boolean'
+    ){
+      return res.status(400).json({message: 'missing field favourite'})
+    }
+    
     console.log(contact)
     if(contact.favorite === false){
       contact.favorite = true
@@ -104,7 +111,8 @@ router.patch('/:contactId/favorite', async (req, res, next) => {
       contact.favorite = false
     }
 
-  
+    await contact.save();
+
     return res.json({
       status: 'success',
       code: 200,
